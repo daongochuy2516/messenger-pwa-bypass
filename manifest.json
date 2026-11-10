@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Messenger App Bypass",
+  "version": "1.0",
+  "description": "Bypass Messenger PWA redirect",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://www.messenger.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.messenger.com/*"],
+      "js": ["bypass.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
