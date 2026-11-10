@@ -38,27 +38,19 @@ Messenger then serves the normal web version, so the app window works like befor
 
 ### Option 2: Tampermonkey / Violentmonkey userscript
 
-Create a new userscript and paste:
+[`bypass.js`](bypass.js) already includes a userscript header, so the same file works as-is:
 
-```js
-// ==UserScript==
-// @name         Messenger PWA Bypass
-// @namespace    https://github.com/daongochuy2516/messenger-pwa-bypass
-// @version      1.0
-// @description  Strip PWA flags so the Messenger app loads the normal web version
-// @match        https://www.messenger.com/*
-// @run-at       document-start
-// @grant        none
-// ==/UserScript==
-```
+1. Open the Tampermonkey dashboard → **Create a new script** (`+` tab).
+2. Delete the template, paste the **entire** contents of [`bypass.js`](bypass.js), and save (`Ctrl+S`).
+3. Open the Messenger app again.
 
-Then paste the contents of [`bypass.js`](bypass.js) below the header and save.
+> Install it in the same browser profile as the Messenger app. The header only applies to userscript managers; when loaded as an extension it is just a comment and is ignored.
 
 ## Files
 
 | File | Purpose |
 | --- | --- |
-| [`bypass.js`](bypass.js) | The script that strips `__pwa` / `ref` and reloads |
+| [`bypass.js`](bypass.js) | The script that strips `__pwa` / `ref` and reloads (also a valid userscript) |
 | [`manifest.json`](manifest.json) | Manifest V3 for loading it as an unpacked extension |
 
 ## Notes
@@ -70,33 +62,58 @@ Then paste the contents of [`bypass.js`](bypass.js) below the header and save.
 
 ## Tiếng Việt
 
-Dùng tiếp **ứng dụng Messenger trên máy tính (PWA)** sau khi Meta ngừng hỗ trợ.
+Tiếp tục dùng **ứng dụng Messenger trên máy tính (PWA)** đã cài sau khi Meta ngừng hỗ trợ.
 
 ### Vấn đề
 
-Từ **15/12/2025**, Meta ngừng hỗ trợ Messenger PWA (kể cả bản trên Microsoft Store). Khi mở app, nó truy cập địa chỉ dạng `https://www.messenger.com/?ref=homescreenpwa&__pwa=1`; Messenger nhận ra cờ `__pwa` và hiện thông báo app không còn được hỗ trợ thay vì hiện tin nhắn.
+Từ ngày **15/12/2025**, Meta ngừng hỗ trợ Messenger PWA (kể cả bản trên Microsoft Store). Khi mở app đã cài, nó sẽ mở một địa chỉ dạng:
+
+```
+https://www.messenger.com/?ref=homescreenpwa&__pwa=1
+```
+
+Hai tham số `__pwa` / `ref` là cờ định tuyến nội bộ. Messenger nhận ra chúng và hiện trang thông báo "ứng dụng không còn được hỗ trợ" thay vì hiện các cuộc trò chuyện của bạn.
 
 ### Cách hoạt động
 
-Script chạy ngay khi trang bắt đầu tải (`document_start`). Nếu URL có `__pwa`, nó xoá tham số `__pwa` và `ref` rồi tải lại trang. Messenger sẽ trả về bản web bình thường nên cửa sổ app dùng được như cũ. Script không gửi request nào, không thu thập dữ liệu, và chỉ chạy trên `https://www.messenger.com/*`.
+Một script nhỏ chạy ngay khi trang `messenger.com` bắt đầu tải (`document_start`). Nếu URL có `__pwa`, script xoá hai tham số `__pwa` và `ref` rồi tải lại trang bằng `location.replace()`:
+
+```
+https://www.messenger.com/?ref=homescreenpwa&__pwa=1  →  https://www.messenger.com/
+```
+
+Khi đó Messenger trả về bản web bình thường, nên cửa sổ app hoạt động như trước. Script không đụng tới gì khác: không gửi request mạng nào, không thu thập dữ liệu, và chỉ chạy trên `https://www.messenger.com/*`.
 
 ### Cài đặt
 
-**Cách 1: Tiện ích trình duyệt (Chrome / Edge / Brave / Chromium)**
+#### Cách 1: Tiện ích trình duyệt (Chrome / Edge / Brave / mọi trình duyệt nhân Chromium)
 
-1. Tải repo về (**Code → Download ZIP** rồi giải nén) hoặc `git clone`.
+1. Tải repo này về (**Code → Download ZIP**) rồi giải nén, hoặc `git clone`.
 2. Mở `chrome://extensions` (hoặc `edge://extensions`).
-3. Bật **Developer mode** (Chế độ nhà phát triển).
+3. Bật **Developer mode** (Chế độ dành cho nhà phát triển).
 4. Bấm **Load unpacked** (Tải tiện ích đã giải nén) và chọn thư mục chứa `manifest.json`.
 5. Mở lại app Messenger.
 
-> Phải cài tiện ích vào **đúng hồ sơ (profile) trình duyệt** đã dùng để cài app Messenger, vì app PWA chạy bên trong trình duyệt đó.
+> Tiện ích phải được cài vào **đúng hồ sơ (profile) trình duyệt** đã dùng để cài app Messenger, vì app PWA chạy bên trong trình duyệt đó.
 
-**Cách 2: Tampermonkey / Violentmonkey**
+#### Cách 2: Userscript cho Tampermonkey / Violentmonkey
 
-Tạo userscript mới, dán phần header ở [mục Option 2](#option-2-tampermonkey--violentmonkey-userscript) phía trên, rồi dán nội dung [`bypass.js`](bypass.js) bên dưới header và lưu lại.
+[`bypass.js`](bypass.js) đã có sẵn header userscript, nên dùng nguyên file đó được luôn:
+
+1. Mở bảng điều khiển (Dashboard) của Tampermonkey → **Tạo script mới** (tab `+`).
+2. Xoá đoạn mẫu có sẵn, dán **toàn bộ** nội dung [`bypass.js`](bypass.js), rồi lưu (`Ctrl+S`).
+3. Mở lại app Messenger.
+
+> Cài vào đúng profile trình duyệt có app Messenger. Phần header chỉ có tác dụng với các trình quản lý userscript; khi nạp dưới dạng tiện ích, nó chỉ là comment và bị bỏ qua.
+
+### Các file
+
+| File | Chức năng |
+| --- | --- |
+| [`bypass.js`](bypass.js) | Script xoá `__pwa` / `ref` rồi tải lại trang (đồng thời là một userscript hợp lệ) |
+| [`manifest.json`](manifest.json) | Manifest V3 để nạp script dưới dạng tiện ích đã giải nén |
 
 ### Lưu ý
 
-- Script chỉ đổi URL lúc app mở. Nếu sau này Meta chặn PWA theo cách khác thì script có thể không còn tác dụng.
-- Dự án không chính thức, không liên quan tới Meta.
+- Script chỉ thay đổi URL mà app mở lúc khởi động. Nếu sau này Meta chặn PWA theo cách khác, script có thể không còn tác dụng.
+- Đây là dự án không chính thức, không liên quan tới Meta.
